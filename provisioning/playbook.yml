@@ -1,0 +1,8 @@
+---
+- name: "Install EPEL"
+  hosts: "webhost"
+  become: yes
+  become_method: sudo
+  roles:
+    - geerlingguy.repo-epel
+
