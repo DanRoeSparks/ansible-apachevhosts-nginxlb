@@ -1,0 +1,9 @@
+---
+configs:
+  usethis: "one_nine_two"
+  one_nine_two:
+    local_ip: "192.168.123.123"
+  ten:
+    local_ip: "10.0.123.123"
+  one_seven_two:
+    local_ip: "172.16.123.123"
