@@ -1,8 +1,41 @@
 ---
-- name: "Install EPEL"
+- name: "Install EPEL, PHP and Apache"
   hosts: "webhost"
   become: yes
   become_method: sudo
+  vars:
+    apache_create_vhosts: false
   roles:
     - geerlingguy.repo-epel
+    - geerlingguy.php
+    - geerlingguy.apache
 
+- name: "Post-Apache Config"
+  hosts: "webhost"
+  become: yes
+  become_method: sudo
+  vars:
+    apache_create_vhosts: false
+    apache_vhosts_filename: "files/vhosts.conf"
+  tasks:
+    - name: "Remove Port 80 Listener"
+      lineinfile:
+        path: /etc/httpd/conf/httpd.conf
+        state: absent
+        regexp: "Listen 80"
+    - name: "Update listening ports"
+      blockinfile:
+        path: /etc/httpd/conf/httpd.conf
+        insertafter: "#Listen 12.34.56.78:80"
+        block: |
+          Listen 81
+          Listen 8080
+    - name: "Add vhosts file"
+      template:
+        src: files/vhosts.conf
+        dest: /etc/httpd/conf.d/vhosts.conf
+    - name: "Restart Apache"
+      service:
+        name: httpd
+        state: restarted
+      
