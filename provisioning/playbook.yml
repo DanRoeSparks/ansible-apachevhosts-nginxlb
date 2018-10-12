@@ -34,6 +34,20 @@
       template:
         src: files/vhosts.conf
         dest: /etc/httpd/conf.d/vhosts.conf
+    - name: "Create webroots"
+      file:
+        path: /var/www/{{item}}
+        state: directory
+      with_items:
+        - "server1"
+        - "server2"
+    - name: "Add index pages"
+      template:
+        src: files/{{item}}.php
+        dest: /var/www/{{item}}/index.php
+      with_items:
+        - "server1"
+        - "server2"
     - name: "Restart Apache"
       service:
         name: httpd
