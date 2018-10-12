@@ -1,4 +1,14 @@
 ---
+- name: "Pre-Apache Config"
+  hosts: "webhost"
+  become: yes
+  become_method: sudo
+  tasks:
+    - name: "Stop nginx"
+      service:
+        name: nginx
+        state: stopped
+      ignore_errors: yes
 - name: "Install EPEL, PHP and Apache"
   hosts: "webhost"
   become: yes
@@ -18,7 +28,7 @@
     apache_create_vhosts: false
     apache_vhosts_filename: "files/vhosts.conf"
   tasks:
-    - name: "Remove Port 80 Listener"
+    - name: "Remove Port 80 Listener added by role"
       lineinfile:
         path: /etc/httpd/conf/httpd.conf
         state: absent
@@ -29,7 +39,7 @@
         insertafter: "#Listen 12.34.56.78:80"
         block: |
           Listen 81
-          Listen 8080
+          Listen 8008
     - name: "Add vhosts file"
       template:
         src: files/vhosts.conf
@@ -52,4 +62,26 @@
       service:
         name: httpd
         state: restarted
+
+- name: "Install nginx"
+  hosts: "webhost"
+  become: yes
+  become_method: sudo
+  roles:
+    - nginxinc.nginx
+
+- name: "Post-nginx Config"
+  hosts: "webhost"
+  become: yes
+  become_method: sudo
+  tasks:
+    - name: "Copy load balancer config"
+      template:
+        src: files/nginx.conf
+        dest: /etc/nginx/nginx.conf
+    - name: "Restart nginx"
+      service:
+        name: nginx
+        state: restarted
+
       
