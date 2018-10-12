@@ -1,5 +1,6 @@
 ---
 - src: geerlingguy.apache
 - src: geerlingguy.repo-epel
+- src: geerlingguy.php
 - src: nginxinc.nginx
 
